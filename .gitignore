@@ -31,3 +31,10 @@ Thumbs.db
 # Project specific binaries and files
 /smtp-forwarder
 coverage.out
+
+# Others
+.env
+/DEV.md
+/config.testing.json
+/config.json
+/docker-compose.dev.yml

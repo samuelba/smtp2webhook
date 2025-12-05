@@ -1,0 +1,101 @@
+{
+  "_comment": "Example: Production-Ready Configuration",
+  "_comment_description": "Recommended settings for production deployment with security best practices",
+  
+  "server": {
+    "port": 587,
+    "_comment_port": "Standard submission port. Use 25 for MX relay, 587 for submission, 465 for implicit TLS",
+    
+    "hostname": "smtp.production.example.com",
+    "_comment_hostname": "Use your actual FQDN here",
+    
+    "security_mode": "starttls",
+    "_comment_security_mode": "STARTTLS is recommended for production - widely compatible and secure",
+    
+    "tls_cert_path": "/etc/smtp-forwarder/certs/fullchain.pem",
+    "_comment_tls_cert_path": "Use Let's Encrypt or your CA-signed certificate",
+    
+    "tls_key_path": "/etc/smtp-forwarder/certs/privkey.pem",
+    "_comment_tls_key_path": "Keep private key secure with proper file permissions (0600)",
+    
+    "max_email_size": 26214400,
+    "_comment_max_email_size": "25MB limit - adjust based on your needs and memory constraints",
+    
+    "max_concurrent_connections": 100,
+    "_comment_max_concurrent_connections": "Limit based on expected load and available resources",
+    
+    "read_timeout": 300,
+    "_comment_read_timeout": "5 minutes - allows for slower clients and large emails",
+    
+    "write_timeout": 60,
+    "_comment_write_timeout": "1 minute for sending responses"
+  },
+  
+  "auth": {
+    "enabled": true,
+    "_comment": "ALWAYS enable authentication in production",
+    "credentials": [
+      {
+        "username": "service_account_1",
+        "password": "CHANGE_ME_STRONG_PASSWORD_1",
+        "_comment": "Use strong, randomly generated passwords"
+      },
+      {
+        "username": "service_account_2",
+        "password": "CHANGE_ME_STRONG_PASSWORD_2",
+        "_comment": "Consider using environment variables or secrets management"
+      }
+    ]
+  },
+  
+  "routes": [
+    {
+      "pattern": "support@production.example.com",
+      "webhook": {
+        "url": "https://api.production.example.com/webhooks/support",
+        "secret": "CHANGE_ME_WEBHOOK_SECRET_1",
+        "timeout": 30,
+        "_comment": "Always use secrets in production for webhook signature verification"
+      }
+    },
+    {
+      "pattern": "alerts@production.example.com",
+      "webhook": {
+        "url": "https://api.production.example.com/webhooks/alerts",
+        "secret": "CHANGE_ME_WEBHOOK_SECRET_2",
+        "timeout": 30
+      }
+    },
+    {
+      "pattern": "*@production.example.com",
+      "webhook": {
+        "url": "https://api.production.example.com/webhooks/catchall",
+        "secret": "CHANGE_ME_WEBHOOK_SECRET_3",
+        "timeout": 30
+      }
+    }
+  ],
+  
+  "defaults": {
+    "webhook": {
+      "url": "https://api.production.example.com/webhooks/default",
+      "secret": "CHANGE_ME_WEBHOOK_SECRET_DEFAULT",
+      "timeout": 30,
+      "_comment": "Always configure a default webhook to avoid rejecting legitimate mail"
+    }
+  },
+  
+  "_production_checklist": {
+    "_comment": "Before deploying to production:",
+    "1": "Replace all CHANGE_ME placeholders with actual secrets",
+    "2": "Use strong, randomly generated passwords (32+ characters)",
+    "3": "Store secrets in environment variables or secrets management system",
+    "4": "Ensure TLS certificates are valid and not self-signed",
+    "5": "Configure proper file permissions on config file (0600)",
+    "6": "Set up monitoring and log aggregation",
+    "7": "Test webhook endpoints are accessible and responding",
+    "8": "Configure firewall rules to restrict SMTP port access",
+    "9": "Set up automated certificate renewal (e.g., certbot for Let's Encrypt)",
+    "10": "Review and adjust resource limits based on expected load"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "_comment": "SMTP Webhook Forwarder - Complete Configuration Example",
+  "_comment_description": "This file demonstrates all available configuration options with detailed explanations",
+  
+  "server": {
+    "_comment": "SMTP server configuration",
+    
+    "port": 2525,
+    "_comment_port": "SMTP listening port. Standard ports: 25 (SMTP), 587 (submission), 2525 (testing). Can be overridden with SMTP_PORT env var",
+    
+    "hostname": "smtp.example.com",
+    "_comment_hostname": "Server hostname used in SMTP greeting. Required field. Can be overridden with SMTP_HOSTNAME env var",
+    
+    "security_mode": "starttls",
+    "_comment_security_mode": "Encryption mode: 'tls' (implicit TLS), 'ssl' (same as tls), 'starttls' (opportunistic TLS), 'none' (plaintext). Can be overridden with SMTP_SECURITY_MODE env var",
+    
+    "tls_cert_path": "/etc/smtp-forwarder/certs/server.crt",
+    "_comment_tls_cert_path": "Path to TLS certificate file. Required when security_mode is not 'none'. Can be overridden with TLS_CERT_PATH env var",
+    
+    "tls_key_path": "/etc/smtp-forwarder/certs/server.key",
+    "_comment_tls_key_path": "Path to TLS private key file. Required when security_mode is not 'none'. Can be overridden with TLS_KEY_PATH env var",
+    
+    "max_email_size": 10485760,
+    "_comment_max_email_size": "Maximum email size in bytes (10MB = 10485760). Emails exceeding this will be rejected with SMTP 552. Can be overridden with MAX_EMAIL_SIZE env var",
+    
+    "max_concurrent_connections": 50,
+    "_comment_max_concurrent_connections": "Maximum number of concurrent SMTP connections. Helps prevent resource exhaustion",
+    
+    "read_timeout": 60,
+    "_comment_read_timeout": "Maximum seconds to wait for client to send email data. Prevents slow client attacks",
+    
+    "write_timeout": 60,
+    "_comment_write_timeout": "Maximum seconds to wait when sending SMTP responses to client"
+  },
+  
+  "auth": {
+    "_comment": "SMTP authentication configuration",
+    
+    "enabled": true,
+    "_comment_enabled": "Whether to require SMTP authentication. When true, clients must provide valid credentials",
+    
+    "credentials": [
+      {
+        "username": "user1",
+        "password": "secure_password_123",
+        "_comment": "First user account - supports PLAIN and LOGIN auth mechanisms"
+      },
+      {
+        "username": "user2",
+        "password": "another_secure_password_456",
+        "_comment": "Second user account - multiple accounts can be configured"
+      }
+    ],
+    "_comment_credentials": "List of valid username/password pairs. Required when auth is enabled. Passwords are case-sensitive"
+  },
+  
+  "routes": [
+    {
+      "_comment": "Exact email address match - highest priority",
+      "pattern": "support@example.com",
+      "webhook": {
+        "url": "https://localhost:8082/webhooks/support",
+        "secret": "whsec_support_secret_abc123",
+        "timeout": 30,
+        "_comment": "Webhook with HMAC-SHA256 signature for security"
+      }
+    },
+    {
+      "_comment": "Another exact match with different webhook",
+      "pattern": "sales@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/sales",
+        "secret": "whsec_sales_secret_def456",
+        "timeout": 30
+      }
+    },
+    {
+      "_comment": "Wildcard domain match - catches all emails at example.com",
+      "pattern": "*@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/catchall",
+        "timeout": 30,
+        "_comment": "No secret configured - webhook will be sent without signature"
+      }
+    },
+    {
+      "_comment": "Another wildcard for different domain",
+      "pattern": "*@test.com",
+      "webhook": {
+        "url": "https://api.test.com/webhooks/incoming",
+        "secret": "whsec_test_secret_ghi789",
+        "timeout": 45,
+        "_comment": "Longer timeout for slower webhook endpoints"
+      }
+    },
+    {
+      "_comment": "Accumulative matching: support@example.com will match BOTH the exact rule above AND this wildcard rule",
+      "pattern": "*@example.com",
+      "webhook": {
+        "url": "https://backup.example.com/webhooks/archive",
+        "timeout": 30,
+        "_comment": "This webhook will also receive emails to support@example.com for redundancy"
+      }
+    }
+  ],
+  "_comment_routes": "Routing rules match recipient addresses. Exact matches: 'user@domain.com'. Wildcard matches: '*@domain.com'. Multiple matches send to all matching webhooks (accumulative)",
+  
+  "defaults": {
+    "_comment": "Default webhook for emails that don't match any routing rule",
+    "webhook": {
+      "url": "https://api.example.com/webhooks/default",
+      "secret": "whsec_default_secret_jkl012",
+      "timeout": 30,
+      "_comment": "If no default is configured, unmatched emails will be rejected with SMTP 550"
+    }
+  }
+}

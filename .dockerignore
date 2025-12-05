@@ -1,0 +1,34 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+
+# Test files
+*_test.go
+coverage.out
+test/
+
+# Spec files
+.kiro/
+
+# Build artifacts
+smtp-forwarder
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Others
+*.conf
+docker-compose*.yml
+.env

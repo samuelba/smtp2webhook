@@ -1,0 +1,51 @@
+{
+  "_comment": "Example: TLS/SSL Mode (Implicit TLS from connection start)",
+  "_comment_description": "Use this configuration for implicit TLS encryption. Client must connect with TLS from the start",
+  
+  "server": {
+    "port": 465,
+    "_comment_port": "Port 465 is traditionally used for SMTPS (implicit TLS)",
+    
+    "hostname": "smtp.example.com",
+    "security_mode": "tls",
+    "_comment_security_mode": "Both 'tls' and 'ssl' work the same - implicit TLS from connection start",
+    
+    "tls_cert_path": "/etc/smtp-forwarder/certs/server.crt",
+    "tls_key_path": "/etc/smtp-forwarder/certs/server.key",
+    
+    "max_email_size": 10485760,
+    "max_concurrent_connections": 50,
+    "read_timeout": 60,
+    "write_timeout": 60
+  },
+  
+  "auth": {
+    "enabled": true,
+    "_comment": "Authentication is recommended when using TLS",
+    "credentials": [
+      {
+        "username": "secure_user",
+        "password": "secure_password_123"
+      }
+    ]
+  },
+  
+  "routes": [
+    {
+      "pattern": "*@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/secure",
+        "secret": "whsec_secure_secret_abc123",
+        "timeout": 30
+      }
+    }
+  ],
+  
+  "defaults": {
+    "webhook": {
+      "url": "https://api.example.com/webhooks/default",
+      "secret": "whsec_default_secret",
+      "timeout": 30
+    }
+  }
+}
