@@ -1403,6 +1403,85 @@ go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
 ```
 
+### Code Formatting and Linting
+
+The project uses standard Go tooling for code quality:
+
+**Formatting:**
+```bash
+# Format all Go files
+go fmt ./...
+
+# Or use gofmt directly
+gofmt -w .
+
+# Check formatting without modifying files
+gofmt -l .
+```
+
+**Linting with golangci-lint (Recommended):**
+
+Install golangci-lint: https://golangci-lint.run/docs/welcome/install/#binaries
+
+Run linter:
+```bash
+# Run all linters
+golangci-lint run
+```
+
+**Other useful Go tools:**
+
+```bash
+# Check for common mistakes
+go vet ./...
+
+# Static analysis
+staticcheck ./...
+
+# Security scanning
+gosec ./...
+
+# Dependency vulnerability check
+go list -json -m all | nancy sleuth
+
+# Check for outdated dependencies
+go list -u -m all
+```
+
+### Development Workflow
+
+**Pre-commit checks:**
+```bash
+# Run before committing
+go fmt ./...
+golangci-lint run
+go test ./...
+go vet ./...
+```
+
+**Continuous Integration:**
+
+The project includes a GitHub Actions workflow that runs:
+- Code formatting checks
+- Linting with golangci-lint
+- Unit tests
+- Property-based tests
+- Build verification
+
+**Local development setup:**
+```bash
+# Install development dependencies
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+go install honnef.co/go/tools/cmd/staticcheck@latest
+
+# Run development server with hot reload (using air)
+go install github.com/cosmtrek/air@latest
+air
+
+# Or use the included docker-compose for development
+docker-compose -f docker-compose.dev.yml up
+```
+
 ### Project Structure
 
 ```
