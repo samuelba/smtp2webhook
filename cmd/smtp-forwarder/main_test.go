@@ -46,13 +46,13 @@ func TestConfigurationLoadingFromFile(t *testing.T) {
 	originalConfigFile := os.Getenv("CONFIG_FILE")
 	defer func() {
 		if originalConfigFile != "" {
-			os.Setenv("CONFIG_FILE", originalConfigFile)
+			_ = os.Setenv("CONFIG_FILE", originalConfigFile)
 		} else {
-			os.Unsetenv("CONFIG_FILE")
+			_ = os.Unsetenv("CONFIG_FILE")
 		}
 	}()
 
-	os.Setenv("CONFIG_FILE", configPath)
+	_ = os.Setenv("CONFIG_FILE", configPath)
 
 	// Test that the config file path is read from environment
 	configPathFromEnv := os.Getenv("CONFIG_FILE")
@@ -78,13 +78,13 @@ func TestConfigurationDefaultPath(t *testing.T) {
 	originalConfigFile := os.Getenv("CONFIG_FILE")
 	defer func() {
 		if originalConfigFile != "" {
-			os.Setenv("CONFIG_FILE", originalConfigFile)
+			_ = os.Setenv("CONFIG_FILE", originalConfigFile)
 		} else {
-			os.Unsetenv("CONFIG_FILE")
+			_ = os.Unsetenv("CONFIG_FILE")
 		}
 	}()
 
-	os.Unsetenv("CONFIG_FILE")
+	_ = os.Unsetenv("CONFIG_FILE")
 
 	// Test that default path is used
 	configPath := os.Getenv("CONFIG_FILE")
@@ -133,17 +133,17 @@ func TestLogLevelEnvironmentVariable(t *testing.T) {
 			originalLogLevel := os.Getenv("LOG_LEVEL")
 			defer func() {
 				if originalLogLevel != "" {
-					os.Setenv("LOG_LEVEL", originalLogLevel)
+					_ = os.Setenv("LOG_LEVEL", originalLogLevel)
 				} else {
-					os.Unsetenv("LOG_LEVEL")
+					_ = os.Unsetenv("LOG_LEVEL")
 				}
 			}()
 
 			// Set test value
 			if tt.envValue != "" {
-				os.Setenv("LOG_LEVEL", tt.envValue)
+				_ = os.Setenv("LOG_LEVEL", tt.envValue)
 			} else {
-				os.Unsetenv("LOG_LEVEL")
+				_ = os.Unsetenv("LOG_LEVEL")
 			}
 
 			// Get log level (simulating main() logic)
@@ -204,32 +204,32 @@ func TestEnvironmentVariableOverrides(t *testing.T) {
 	defer func() {
 		// Restore original values
 		if originalSMTPPort != "" {
-			os.Setenv("SMTP_PORT", originalSMTPPort)
+			_ = os.Setenv("SMTP_PORT", originalSMTPPort)
 		} else {
-			os.Unsetenv("SMTP_PORT")
+			_ = os.Unsetenv("SMTP_PORT")
 		}
 		if originalMaxEmailSize != "" {
-			os.Setenv("MAX_EMAIL_SIZE", originalMaxEmailSize)
+			_ = os.Setenv("MAX_EMAIL_SIZE", originalMaxEmailSize)
 		} else {
-			os.Unsetenv("MAX_EMAIL_SIZE")
+			_ = os.Unsetenv("MAX_EMAIL_SIZE")
 		}
 		if originalHostname != "" {
-			os.Setenv("SMTP_HOSTNAME", originalHostname)
+			_ = os.Setenv("SMTP_HOSTNAME", originalHostname)
 		} else {
-			os.Unsetenv("SMTP_HOSTNAME")
+			_ = os.Unsetenv("SMTP_HOSTNAME")
 		}
 		if originalSecurityMode != "" {
-			os.Setenv("SMTP_SECURITY_MODE", originalSecurityMode)
+			_ = os.Setenv("SMTP_SECURITY_MODE", originalSecurityMode)
 		} else {
-			os.Unsetenv("SMTP_SECURITY_MODE")
+			_ = os.Unsetenv("SMTP_SECURITY_MODE")
 		}
 	}()
 
 	// Set environment variable overrides
-	os.Setenv("SMTP_PORT", "3030")
-	os.Setenv("MAX_EMAIL_SIZE", "20971520")
-	os.Setenv("SMTP_HOSTNAME", "mail.example.com")
-	os.Setenv("SMTP_SECURITY_MODE", "starttls")
+	_ = os.Setenv("SMTP_PORT", "3030")
+	_ = os.Setenv("MAX_EMAIL_SIZE", "20971520")
+	_ = os.Setenv("SMTP_HOSTNAME", "mail.example.com")
+	_ = os.Setenv("SMTP_SECURITY_MODE", "starttls")
 
 	// Verify environment variables are set
 	if os.Getenv("SMTP_PORT") != "3030" {

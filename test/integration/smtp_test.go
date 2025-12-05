@@ -641,9 +641,9 @@ func TestConfigurationFromEnvironment(t *testing.T) {
 
 	// Set environment variables
 	newPort := getFreePort(t)
-	os.Setenv("SMTP_PORT", fmt.Sprintf("%d", newPort))
-	os.Setenv("SMTP_HOSTNAME", "env-hostname")
-	os.Setenv("MAX_EMAIL_SIZE", "2097152")
+	_ = os.Setenv("SMTP_PORT", fmt.Sprintf("%d", newPort))
+	_ = os.Setenv("SMTP_HOSTNAME", "env-hostname")
+	_ = os.Setenv("MAX_EMAIL_SIZE", "2097152")
 	defer func() {
 		_ = os.Unsetenv("SMTP_PORT")
 		_ = os.Unsetenv("SMTP_HOSTNAME")
