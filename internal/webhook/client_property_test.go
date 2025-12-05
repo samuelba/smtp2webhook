@@ -39,8 +39,8 @@ func TestProperty_StandardWebhooksHeadersPresence(t *testing.T) {
 				mu.Unlock()
 
 				// Read and discard body
-				io.ReadAll(r.Body)
-				r.Body.Close()
+				_, _ = io.ReadAll(r.Body)
+				_ = r.Body.Close()
 
 				w.WriteHeader(http.StatusOK)
 			}))
@@ -309,8 +309,8 @@ func TestProperty_SessionIDInWebhookHeaders(t *testing.T) {
 				mu.Unlock()
 
 				// Read and discard body
-				io.ReadAll(r.Body)
-				r.Body.Close()
+				_, _ = io.ReadAll(r.Body)
+				_ = r.Body.Close()
 
 				w.WriteHeader(http.StatusOK)
 			}))

@@ -36,7 +36,7 @@ func TestEndToEndSMTPToWebhook(t *testing.T) {
 	webhookServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Read the payload
 		body, _ := io.ReadAll(r.Body)
-		json.Unmarshal(body, &receivedPayload)
+		_ = json.Unmarshal(body, &receivedPayload)
 		receivedHeaders = r.Header.Clone()
 		w.WriteHeader(http.StatusOK)
 	}))
@@ -70,7 +70,7 @@ func TestEndToEndSMTPToWebhook(t *testing.T) {
 
 	// Start SMTP server
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 
 	// Give server time to start
 	time.Sleep(100 * time.Millisecond)
@@ -151,7 +151,7 @@ func TestAuthenticationEnabled(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	// Test with valid credentials
@@ -218,7 +218,7 @@ func TestAuthenticationDisabled(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	// Should be able to send without authentication
@@ -233,8 +233,8 @@ func TestAuthenticationDisabled(t *testing.T) {
 func TestTLSMode(t *testing.T) {
 	// Generate test certificates
 	certFile, keyFile := generateTestCerts(t)
-	defer os.Remove(certFile)
-	defer os.Remove(keyFile)
+	defer func() { _ = os.Remove(certFile) }()
+	defer func() { _ = os.Remove(keyFile) }()
 
 	webhookServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -268,7 +268,7 @@ func TestTLSMode(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	// Send email with STARTTLS
@@ -332,7 +332,7 @@ func TestRoutingExactMatch(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	// Send to exact@example.com
@@ -392,7 +392,7 @@ func TestRoutingWildcardMatch(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	// Send to any address at example.com
@@ -453,7 +453,7 @@ func TestWebhookSignatureVerification(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	err := sendTestEmail(t, cfg.Server.Port, "sender@example.com", []string{"test@example.com"}, "Test", "Body")
@@ -533,7 +533,7 @@ func TestWebhookFailureHandling(t *testing.T) {
 			}
 
 			smtpSrv := startTestSMTPServer(t, cfg)
-			defer smtpSrv.Stop()
+			defer func() { _ = smtpSrv.Stop() }()
 			time.Sleep(100 * time.Millisecond)
 
 			err := sendTestEmail(t, cfg.Server.Port, "sender@example.com", []string{"test@example.com"}, "Test", "Body")
@@ -588,7 +588,7 @@ func TestWebhookTimeout(t *testing.T) {
 	}
 
 	smtpSrv := startTestSMTPServer(t, cfg)
-	defer smtpSrv.Stop()
+	defer func() { _ = smtpSrv.Stop() }()
 	time.Sleep(100 * time.Millisecond)
 
 	err := sendTestEmail(t, cfg.Server.Port, "sender@example.com", []string{"test@example.com"}, "Test", "Body")
@@ -637,7 +637,7 @@ func TestConfigurationFromEnvironment(t *testing.T) {
 	}
 
 	configData, _ := json.MarshalIndent(baseConfig, "", "  ")
-	os.WriteFile(configPath, configData, 0644)
+	_ = os.WriteFile(configPath, configData, 0644)
 
 	// Set environment variables
 	newPort := getFreePort(t)
@@ -728,7 +728,7 @@ func sendTestEmail(t *testing.T, port int, from string, to []string, subject, bo
 	if err != nil {
 		return fmt.Errorf("dial failed: %w", err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 
 	if err := c.Mail(from); err != nil {
 		return fmt.Errorf("MAIL FROM failed: %w", err)
@@ -776,7 +776,7 @@ func sendEmailWithSTARTTLS(t *testing.T, port int, from string, to []string, sub
 	if err != nil {
 		return fmt.Errorf("dial failed: %w", err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 
 	// Start TLS
 	tlsConfig := &tls.Config{
@@ -821,12 +821,12 @@ func getFreePort(t *testing.T) int {
 		t.Fatalf("Failed to get free port: %v", err)
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
-	listener.Close()
+	_ = listener.Close()
 	return port
 }
 
 func mustParseInt64(s string) int64 {
 	var i int64
-	fmt.Sscanf(s, "%d", &i)
+	_, _ = fmt.Sscanf(s, "%d", &i)
 	return i
 }

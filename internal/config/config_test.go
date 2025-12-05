@@ -356,21 +356,21 @@ func TestEnvironmentVariableOverrides(t *testing.T) {
 	}
 
 	// Set environment variables
-	os.Setenv("SMTP_PORT", "3030")
-	os.Setenv("MAX_EMAIL_SIZE", "20971520")
-	os.Setenv("SMTP_HOSTNAME", "override.example.com")
+	_ = os.Setenv("SMTP_PORT", "3030")
+	_ = os.Setenv("MAX_EMAIL_SIZE", "20971520")
+	_ = os.Setenv("SMTP_HOSTNAME", "override.example.com")
 	os.Setenv("SMTP_SECURITY_MODE", "starttls")
 	os.Setenv("TLS_CERT_PATH", "/path/to/cert.pem")
 	os.Setenv("TLS_KEY_PATH", "/path/to/key.pem")
 
 	// Clean up environment variables after test
 	defer func() {
-		os.Unsetenv("SMTP_PORT")
-		os.Unsetenv("MAX_EMAIL_SIZE")
-		os.Unsetenv("SMTP_HOSTNAME")
-		os.Unsetenv("SMTP_SECURITY_MODE")
-		os.Unsetenv("TLS_CERT_PATH")
-		os.Unsetenv("TLS_KEY_PATH")
+		_ = os.Unsetenv("SMTP_PORT")
+		_ = os.Unsetenv("MAX_EMAIL_SIZE")
+		_ = os.Unsetenv("SMTP_HOSTNAME")
+		_ = os.Unsetenv("SMTP_SECURITY_MODE")
+		_ = os.Unsetenv("TLS_CERT_PATH")
+		_ = os.Unsetenv("TLS_KEY_PATH")
 	}()
 
 	config, err := Load(configPath)

@@ -121,7 +121,7 @@ func (c *HTTPClient) Send(ctx context.Context, webhook WebhookConfig, payload *W
 			Error: fmt.Errorf("failed to send request: %w", err),
 		}, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Read response body
 	respBody, err := io.ReadAll(resp.Body)

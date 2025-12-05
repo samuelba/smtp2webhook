@@ -51,8 +51,8 @@ func generateTestCerts(t *testing.T) (certFile, keyFile string) {
 	if err != nil {
 		t.Fatalf("Failed to create cert file: %v", err)
 	}
-	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
-	certOut.Close()
+	_ = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
+	_ = certOut.Close()
 
 	// Write private key to file
 	keyFile = filepath.Join(tmpDir, "key.pem")
@@ -60,8 +60,8 @@ func generateTestCerts(t *testing.T) (certFile, keyFile string) {
 	if err != nil {
 		t.Fatalf("Failed to create key file: %v", err)
 	}
-	pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)})
-	keyOut.Close()
+	_ = pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)})
+	_ = keyOut.Close()
 
 	return certFile, keyFile
 }

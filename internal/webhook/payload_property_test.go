@@ -39,7 +39,7 @@ func TestProperty_SessionIDInWebhookPayload(t *testing.T) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				r.Body.Close()
+				_ = r.Body.Close()
 
 				// Parse the JSON payload
 				var payload WebhookPayload

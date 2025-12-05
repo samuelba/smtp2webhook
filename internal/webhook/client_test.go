@@ -153,7 +153,7 @@ func TestHeaderInclusion(t *testing.T) {
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				capturedHeaders = r.Header.Clone()
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				w.WriteHeader(http.StatusOK)
 			}))
 			defer server.Close()
@@ -263,7 +263,7 @@ func TestTimeoutHandling(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create test server with delay
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				time.Sleep(tt.serverDelay)
 				w.WriteHeader(http.StatusOK)
 			}))
@@ -368,10 +368,10 @@ func TestResponseParsing(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create test server with configured response
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				w.WriteHeader(tt.serverStatusCode)
 				if tt.serverResponseBody != "" {
-					w.Write([]byte(tt.serverResponseBody))
+					_, _ = w.Write([]byte(tt.serverResponseBody))
 				}
 			}))
 			defer server.Close()
@@ -433,7 +433,7 @@ func TestResponseParsing(t *testing.T) {
 func TestDefaultTimeout(t *testing.T) {
 	// Create test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.ReadAll(r.Body)
+		_, _ = io.ReadAll(r.Body)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer server.Close()
@@ -480,7 +480,7 @@ func TestDefaultTimeout(t *testing.T) {
 func TestContextCancellation(t *testing.T) {
 	// Create test server with delay
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		io.ReadAll(r.Body)
+		_, _ = io.ReadAll(r.Body)
 		time.Sleep(2 * time.Second)
 		w.WriteHeader(http.StatusOK)
 	}))

@@ -140,12 +140,13 @@ func (h *Handler) Handle(ctx context.Context, from string, to []string, data io.
 	}
 
 	// Return appropriate SMTP response based on worst code
-	if worstSMTPCode == 250 {
+	switch worstSMTPCode {
+	case 250:
 		sessionLogger.Info("email processed successfully")
 		return nil
-	} else if worstSMTPCode == 451 {
+	case 451:
 		return &SMTPError{Code: 451, Message: "Temporary failure"}
-	} else {
+	default:
 		return &SMTPError{Code: 550, Message: "Permanent failure"}
 	}
 }

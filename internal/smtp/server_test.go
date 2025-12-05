@@ -38,7 +38,7 @@ func createTestCertificates(t *testing.T) (certPath, keyPath string, cleanup fun
 	// Generate private key
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		os.RemoveAll(tmpDir)
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to generate private key: %v", err)
 	}
 
@@ -58,39 +58,39 @@ func createTestCertificates(t *testing.T) (certPath, keyPath string, cleanup fun
 	// Create self-signed certificate
 	certDER, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
 	if err != nil {
-		os.RemoveAll(tmpDir)
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create certificate: %v", err)
 	}
 
 	// Write certificate to file
 	certFile, err := os.Create(certPath)
 	if err != nil {
-		os.RemoveAll(tmpDir)
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create cert file: %v", err)
 	}
 	if err := pem.Encode(certFile, &pem.Block{Type: "CERTIFICATE", Bytes: certDER}); err != nil {
-		certFile.Close()
-		os.RemoveAll(tmpDir)
+		_ = certFile.Close()
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to encode certificate: %v", err)
 	}
-	certFile.Close()
+	_ = certFile.Close()
 
 	// Write private key to file
 	keyFile, err := os.Create(keyPath)
 	if err != nil {
-		os.RemoveAll(tmpDir)
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create key file: %v", err)
 	}
 	privateKeyBytes := x509.MarshalPKCS1PrivateKey(privateKey)
 	if err := pem.Encode(keyFile, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: privateKeyBytes}); err != nil {
-		keyFile.Close()
-		os.RemoveAll(tmpDir)
+		_ = keyFile.Close()
+		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to encode private key: %v", err)
 	}
-	keyFile.Close()
+	_ = keyFile.Close()
 
 	cleanup = func() {
-		os.RemoveAll(tmpDir)
+		_ = os.RemoveAll(tmpDir)
 	}
 
 	return certPath, keyPath, cleanup
