@@ -1,0 +1,106 @@
+{
+  "_comment": "Example: Advanced Routing Patterns",
+  "_comment_description": "Demonstrates exact matching, wildcard matching, and accumulative matching behavior",
+  
+  "server": {
+    "port": 2525,
+    "hostname": "smtp.example.com",
+    "security_mode": "none",
+    "max_email_size": 10485760,
+    "max_concurrent_connections": 50,
+    "read_timeout": 60,
+    "write_timeout": 60
+  },
+  
+  "auth": {
+    "enabled": false,
+    "credentials": []
+  },
+  
+  "routes": [
+    {
+      "_comment": "Exact match #1: support@example.com goes here",
+      "pattern": "support@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/support-primary",
+        "secret": "whsec_support_primary",
+        "timeout": 30
+      }
+    },
+    {
+      "_comment": "Exact match #2: sales@example.com goes here",
+      "pattern": "sales@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/sales",
+        "secret": "whsec_sales",
+        "timeout": 30
+      }
+    },
+    {
+      "_comment": "Wildcard match #1: All @example.com addresses (including support and sales)",
+      "pattern": "*@example.com",
+      "webhook": {
+        "url": "https://api.example.com/webhooks/example-archive",
+        "timeout": 30,
+        "_comment": "ACCUMULATIVE: support@example.com will be sent to BOTH support-primary AND example-archive"
+      }
+    },
+    {
+      "_comment": "Wildcard match #2: All @test.com addresses",
+      "pattern": "*@test.com",
+      "webhook": {
+        "url": "https://api.test.com/webhooks/incoming",
+        "secret": "whsec_test",
+        "timeout": 30
+      }
+    },
+    {
+      "_comment": "Exact match #3: admin@test.com",
+      "pattern": "admin@test.com",
+      "webhook": {
+        "url": "https://api.test.com/webhooks/admin",
+        "secret": "whsec_admin",
+        "timeout": 30,
+        "_comment": "ACCUMULATIVE: admin@test.com will be sent to BOTH admin AND incoming webhooks"
+      }
+    },
+    {
+      "_comment": "Another wildcard for @test.com - demonstrates multiple wildcards for same domain",
+      "pattern": "*@test.com",
+      "webhook": {
+        "url": "https://backup.test.com/webhooks/backup",
+        "timeout": 30,
+        "_comment": "ACCUMULATIVE: All @test.com emails go to THREE webhooks (incoming, admin if applicable, and backup)"
+      }
+    },
+    {
+      "_comment": "Wildcard for another domain",
+      "pattern": "*@company.org",
+      "webhook": {
+        "url": "https://api.company.org/webhooks/mail",
+        "secret": "whsec_company",
+        "timeout": 30
+      }
+    }
+  ],
+  
+  "defaults": {
+    "_comment": "Fallback for addresses that don't match any pattern (e.g., user@unknown.com)",
+    "webhook": {
+      "url": "https://api.example.com/webhooks/unmatched",
+      "timeout": 30,
+      "_comment": "Without this default, unmatched emails would be rejected with SMTP 550"
+    }
+  },
+  
+  "_routing_examples": {
+    "_comment": "How emails are routed with this configuration:",
+    "support@example.com": "Sent to: support-primary, example-archive (2 webhooks)",
+    "sales@example.com": "Sent to: sales, example-archive (2 webhooks)",
+    "user@example.com": "Sent to: example-archive (1 webhook)",
+    "admin@test.com": "Sent to: admin, incoming, backup (3 webhooks)",
+    "user@test.com": "Sent to: incoming, backup (2 webhooks)",
+    "user@company.org": "Sent to: mail (1 webhook)",
+    "user@unknown.com": "Sent to: unmatched (default webhook)"
+  }
+}

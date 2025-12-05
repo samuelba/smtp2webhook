@@ -1,0 +1,55 @@
+services:
+  # SMTP Webhook Forwarder Service
+  smtp-forwarder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smtp-forwarder
+    ports:
+      - "2525:2525"  # SMTP port
+    volumes:
+      # Mount configuration file
+      - ./config.example.json:/etc/smtp-forwarder/config.json:ro
+      # Mount TLS certificates directory (create these if using TLS)
+      - ./certs:/etc/smtp-forwarder/certs:ro
+    environment:
+      # Configuration file path
+      - CONFIG_FILE=/etc/smtp-forwarder/config.json
+      # Log level (debug, info, error)
+      - LOG_LEVEL=info
+      # Optional: Override SMTP port from config
+      # - SMTP_PORT=2525
+      # Optional: Override max email size
+      # - MAX_EMAIL_SIZE=10485760
+    depends_on:
+      - webhook-receiver
+    networks:
+      - smtp-network
+    restart: unless-stopped
+    # Health check is defined in Dockerfile using Alpine's nc (netcat)
+    # Checks TCP connection to SMTP port 2525
+
+  # Example Webhook Receiver Service for Testing
+  webhook-receiver:
+    image: mendhak/http-https-echo:latest
+    container_name: webhook-receiver
+    ports:
+      - "8080:8080"   # HTTP endpoint
+      - "8443:8443"   # HTTPS endpoint
+    environment:
+      # Enable detailed logging
+      - HTTP_PORT=8080
+      - HTTPS_PORT=8443
+    networks:
+      - smtp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  smtp-network:
+    driver: bridge
