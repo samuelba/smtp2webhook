@@ -359,9 +359,9 @@ func TestEnvironmentVariableOverrides(t *testing.T) {
 	_ = os.Setenv("SMTP_PORT", "3030")
 	_ = os.Setenv("MAX_EMAIL_SIZE", "20971520")
 	_ = os.Setenv("SMTP_HOSTNAME", "override.example.com")
-	os.Setenv("SMTP_SECURITY_MODE", "starttls")
-	os.Setenv("TLS_CERT_PATH", "/path/to/cert.pem")
-	os.Setenv("TLS_KEY_PATH", "/path/to/key.pem")
+	_ = os.Setenv("SMTP_SECURITY_MODE", "starttls")
+	_ = os.Setenv("TLS_CERT_PATH", "/path/to/cert.pem")
+	_ = os.Setenv("TLS_KEY_PATH", "/path/to/key.pem")
 
 	// Clean up environment variables after test
 	defer func() {

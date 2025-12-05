@@ -645,9 +645,9 @@ func TestConfigurationFromEnvironment(t *testing.T) {
 	os.Setenv("SMTP_HOSTNAME", "env-hostname")
 	os.Setenv("MAX_EMAIL_SIZE", "2097152")
 	defer func() {
-		os.Unsetenv("SMTP_PORT")
-		os.Unsetenv("SMTP_HOSTNAME")
-		os.Unsetenv("MAX_EMAIL_SIZE")
+		_ = os.Unsetenv("SMTP_PORT")
+		_ = os.Unsetenv("SMTP_HOSTNAME")
+		_ = os.Unsetenv("MAX_EMAIL_SIZE")
 	}()
 
 	// Load config (should apply env overrides)
