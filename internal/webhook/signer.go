@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"strings"
 )
 
 // Signer generates Standard Webhooks signatures for webhook requests.
@@ -25,7 +26,7 @@ func NewSigner() Signer {
 // The signature format is: v1,{base64(hmac-sha256(secret, payload))}
 //
 // Parameters:
-//   - secret: The webhook secret used for signing
+//   - secret: The webhook secret used for signing. Can be raw string or "whsec_"{base64}
 //   - msgID: The webhook message ID (session ID)
 //   - timestamp: Unix timestamp in seconds
 //   - body: The JSON body bytes
@@ -39,11 +40,22 @@ func (s *HMACSigner) Sign(secret string, msgID string, timestamp int64, body []b
 		return "", fmt.Errorf("msgID cannot be empty")
 	}
 
+	var key []byte
+	if strings.HasPrefix(secret, "whsec_") {
+		var err error
+		key, err = base64.StdEncoding.DecodeString(strings.TrimPrefix(secret, "whsec_"))
+		if err != nil {
+			return "", fmt.Errorf("failed to decode whsec_ secret: %w", err)
+		}
+	} else {
+		key = []byte(secret)
+	}
+
 	// Construct the signature payload: {webhook-id}.{timestamp}.{body}
 	payload := fmt.Sprintf("%s.%d.%s", msgID, timestamp, string(body))
 
 	// Compute HMAC-SHA256
-	h := hmac.New(sha256.New, []byte(secret))
+	h := hmac.New(sha256.New, key)
 	h.Write([]byte(payload))
 	signature := h.Sum(nil)
 
